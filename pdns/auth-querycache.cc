@@ -207,19 +207,22 @@ void AuthQueryCache::cleanup()
    we will not clean more often than every 30 seconds anyhow.
 */
 
+/**
+ * 这段代码的目的是通过动态调整清理间隔，在保证缓存数据有效性的同时，避免在高负载情况下过于频繁地清理缓存，从而提高系统的性能和稳定性。
+ */
 void AuthQueryCache::cleanupIfNeeded()
 {
   if (d_ops++ == d_nextclean) {
     time_t now = time(nullptr);
     int timediff = max((int)(now - d_lastclean), 1);
 
-    DLOG(g_log<<"cleaninterval: "<<d_cleaninterval<<", timediff: "<<timediff<<endl);
+    g_log << "cleaninterval: " << d_cleaninterval << ", timediff: " << timediff << endl;
 
     if (d_cleaninterval == s_maxcleaninterval && timediff < 30) {
       d_cleanskipped = true;
       d_nextclean += d_cleaninterval;
 
-      DLOG(g_log<<"cleaning skipped, timediff: "<<timediff<<endl);
+      g_log << "cleaning skipped, timediff: " << timediff << endl;
 
       return;
     }
@@ -229,7 +232,7 @@ void AuthQueryCache::cleanupIfNeeded()
       d_cleaninterval=std::max(d_cleaninterval, s_mincleaninterval);
       d_cleaninterval=std::min(d_cleaninterval, s_maxcleaninterval);
 
-      DLOG(g_log<<"new cleaninterval: "<<d_cleaninterval<<endl);
+      g_log << "new cleaninterval: " << d_cleaninterval << endl;
     } else {
       d_cleanskipped = false;
     }

@@ -106,6 +106,7 @@ bool UeberBackend::loadModules(const vector<string>& modules, const string& path
 
 void UeberBackend::go()
 {
+  g_log << Logger::Debug << "进入 UeberBackend::go() 函数中" << endl;
   if (::arg().mustDo("consistent-backends")) {
     s_doANYLookupsOnly = true;
   }
@@ -117,7 +118,7 @@ void UeberBackend::go()
     std::unique_lock<std::mutex> l(d_mut);
     d_go = true;
   }
-  d_cond.notify_all();
+  d_cond.notify_all(); // 通知所有等待在条件变量 d_cond 上的线程, 告诉它们 UeberBackend 实例已经准备好运行.
 }
 
 bool UeberBackend::getDomainInfo(const DNSName& domain, DomainInfo& domainInfo, bool getSerial)
@@ -279,6 +280,9 @@ void UeberBackend::reload()
 
 void UeberBackend::updateZoneCache()
 {
+  /**
+   * `g_zoneCache` 是在 `auth-main.cc` 中定义的, 该文件中并没有显示的引入, C++的可读性还是差一些啊
+   */
   if (!g_zoneCache.isEnabled()) {
     return;
   }
@@ -377,9 +381,9 @@ bool UeberBackend::fillSOAFromZoneRecord(DNSName& shorter, const int zoneId, SOA
 UeberBackend::CacheResult UeberBackend::fillSOAFromCache(SOAData* soaData, DNSName& shorter)
 {
   auto cacheResult = cacheHas(d_question, d_answers);
-
+  g_log << Logger::Debug << "UeberBackend::fillSOAFromCache 函数中缓存查询结果: cacheResult: " << cacheResult << endl;
   if (cacheResult == CacheResult::Hit && !d_answers.empty() && d_cache_ttl != 0U) {
-    DLOG(g_log << Logger::Error << "has pos cache entry: " << shorter << endl);
+    g_log << Logger::Error << "has pos cache entry: " << shorter << endl;
     fillSOAData(d_answers[0], *soaData);
 
     soaData->db = backends.size() == 1 ? backends.begin()->get() : nullptr;
@@ -454,29 +458,33 @@ bool UeberBackend::getAuth(const DNSName& target, const QType& qtype, SOAData* s
   // backend again for b.c.example.com., c.example.com. and example.com.
   // If a backend has no match it may respond with an empty qname.
 
+  /**
+   * 后端可以使用其拥有的“最佳”匹配来响应我们的权限请求。例如，当被要求输入 a.b.c.example.com. 时，它可能会使用 com 进行响应。
+   * 然后，我们存储该信息并继续查询其他后端，以防其中一个后端具有更具体的区域，但不必再向该特定后端询问 b.c.example.com.、c.example.com. 和 example.com。
+   * 如果后端没有匹配项，它可能会使用空 qname 进行响应。
+   * @param cachedOk 是否允许使用缓存 (默认允许)
+   */
+
   bool found = false;
   DNSName shorter(target);
   vector<pair<size_t, SOAData>> bestMatches(backends.size(), pair(target.wirelength() + 1, SOAData()));
 
   bool first = true;
-  while (first || shorter.chopOff()) {
+  while (first || shorter.chopOff()) { // 妙啊, 这里使用了短路求值, 如果 first 为 true, 则不会执行 shorter.chopOff()
     first = false;
 
     int zoneId{-1};
 
     if (cachedOk && g_zoneCache.isEnabled()) {
+      g_log << Logger::Debug << "开始在 g_zoneCache 中查找最佳匹配的 zoneId" << endl;
       if (g_zoneCache.getEntry(shorter, zoneId)) {
+        g_log << Logger::Debug << "在 g_zoneCache 找到的 zoneId 为 " << zoneId << endl;
         if (fillSOAFromZoneRecord(shorter, zoneId, soaData)) {
-          if (foundTarget(target, shorter, qtype, soaData, found)) {
-            return true;
-          }
-
+          if (foundTarget(target, shorter, qtype, soaData, found)) return true;
           found = true;
         }
-
         continue;
       }
-
       // Zone does not exist, try again with a shorter name.
       continue;
     }
@@ -504,6 +512,7 @@ bool UeberBackend::getAuth(const DNSName& target, const QType& qtype, SOAData* s
 
     // Check backends.
     {
+      g_log << Logger::Debug << "开始查找最佳匹配的后端" << endl;
       auto backend = findBestMatchingBackend(backends, bestMatches, shorter, soaData);
 
       // Add to cache
@@ -637,7 +646,7 @@ enum UeberBackend::CacheResult UeberBackend::cacheHas(const Question& question, 
     return CacheResult::Miss;
   }
 
-  resourceRecords.clear();
+  resourceRecords.clear(); // 调用前来一个情况操作, 这代码写的真有意思
   //  g_log<<Logger::Warning<<"looking up: '"<<q.qname+"'|N|"+q.qtype.getName()+"|"+itoa(q.zoneId)<<endl;
 
   bool ret = QC.getEntry(question.qname, question.qtype, resourceRecords, question.zoneId); // think about lowercasing here
@@ -706,7 +715,7 @@ void UeberBackend::lookup(const QType& qtype, const DNSName& qname, int zoneId, 
     throw PDNSException("We are stale, please recycle");
   }
 
-  DLOG(g_log << "UeberBackend received question for " << qtype << " of " << qname << endl);
+  g_log << "UeberBackend received question for " << qtype << " of " << qname << endl;
   if (!d_go) {
     g_log << Logger::Error << "UeberBackend is blocked, waiting for 'go'" << endl;
     std::unique_lock<std::mutex> l(d_mut);

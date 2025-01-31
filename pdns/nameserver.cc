@@ -216,6 +216,7 @@ UDPNameserver::UDPNameserver( bool additional_socket )
 
 void UDPNameserver::send(DNSPacket& p)
 {
+  g_log << Logger::Debug << "进入 UDPNameserver::send() 中"<<endl;
   const string& buffer=p.getString();
   g_rs.submitResponse(p, true);
 
@@ -241,6 +242,7 @@ void UDPNameserver::send(DNSPacket& p)
 
 bool UDPNameserver::receive(DNSPacket& packet, std::string& buffer)
 {
+  g_log << Logger::Debug << "进入 UDPNameserver::receive() 中"<<endl;
   ComboAddress remote;
   extern StatBag S;
   ssize_t len=-1;
@@ -284,7 +286,7 @@ bool UDPNameserver::receive(DNSPacket& packet, std::string& buffer)
   if(sock==-1)
     throw PDNSException("poll betrayed us! (should not happen)");
   
-  DLOG(g_log<<"Received a packet " << len <<" bytes long from "<< remote.toString()<<endl);
+  g_log << "Received a packet " << len <<" bytes long from "<< remote.toString()<<endl;
 
   BOOST_STATIC_ASSERT(offsetof(sockaddr_in, sin_port) == offsetof(sockaddr_in6, sin6_port));
 
@@ -327,6 +329,7 @@ bool UDPNameserver::receive(DNSPacket& packet, std::string& buffer)
     packet.d_inner_remote.reset();
   }
 
+  g_log << Logger::Debug << "开始对收到的 DNS Packet 进行解析"<< endl;
   if(packet.parse(&buffer.at(0), (size_t) len)<0) {
     S.inc("corrupt-packets");
     S.ringAccount("remotes-corrupt", packet.getInnerRemote());

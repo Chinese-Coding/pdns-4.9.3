@@ -527,8 +527,7 @@ public:
 
 struct SOAData
 {
-  SOAData() :
-    domain_id(-1){};
+  SOAData() : domain_id(-1){};
 
   DNSName qname;
   DNSName nameserver;

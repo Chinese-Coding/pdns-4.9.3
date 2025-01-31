@@ -1174,6 +1174,7 @@ static bool validDNSName(const DNSName& name)
 
 std::unique_ptr<DNSPacket> PacketHandler::question(DNSPacket& p)
 {
+  g_log << Logger::Debug << "进入 PacketHandler::question 函数中" <<endl;
   std::unique_ptr<DNSPacket> ret{nullptr};
 
   if(d_pdl)
@@ -1336,6 +1337,7 @@ bool PacketHandler::tryWildcard(DNSPacket& p, std::unique_ptr<DNSPacket>& r, DNS
 //! Called by the Distributor to ask a question. Returns 0 in case of an error
 std::unique_ptr<DNSPacket> PacketHandler::doQuestion(DNSPacket& p)
 {
+  g_log << Logger::Debug << "进入 PacketHandler::doQuestion 函数中" <<endl;
   DNSZoneRecord rr;
 
   int retargetcount=0;
@@ -1363,13 +1365,14 @@ std::unique_ptr<DNSPacket> PacketHandler::doQuestion(DNSPacket& p)
 
   if(p.d.tc) { // truncated query. MOADNSParser would silently parse this packet in an incomplete way.
     if(d_logDNSDetails)
-      g_log<<Logger::Error<<"Received truncated query packet from "<<p.getRemoteString()<<", dropping"<<endl;
+      g_log << Logger::Error << "Received truncated query packet from " << p.getRemoteString()<< ", dropping" << endl;
     S.inc("corrupt-packets");
     S.ringAccount("remotes-corrupt", p.getInnerRemote());
     return nullptr;
   }
 
   if (p.hasEDNS()) {
+    g_log << Logger::Debug << "收到来自 "<< p.getRemoteString() << " 的 EDNS 包, 版本为" << p.getEDNSVersion() << endl;
     if(p.getEDNSVersion() > 0) {
       r = p.replyPacket();
 
@@ -1392,13 +1395,14 @@ std::unique_ptr<DNSPacket> PacketHandler::doQuestion(DNSPacket& p)
   }
 
   if(p.d_havetsig) {
+    g_log << Logger::Debug << "Received a TSIG signed message from " << p.getRemoteString() << endl;
     DNSName keyname;
     string secret;
     TSIGRecordContent trc;
     if(!p.checkForCorrectTSIG(&B, &keyname, &secret, &trc)) {
       r=p.replyPacket();  // generate an empty reply packet
       if(d_logDNSDetails)
-        g_log<<Logger::Error<<"Received a TSIG signed message with a non-validating key"<<endl;
+        g_log << Logger::Error << "Received a TSIG signed message with a non-validating key" << endl;
       // RFC3007 describes that a non-secure message should be sending Refused for DNS Updates
       if (p.d.opcode == Opcode::Update)
         r->setRcode(RCode::Refused);
@@ -1407,6 +1411,14 @@ std::unique_ptr<DNSPacket> PacketHandler::doQuestion(DNSPacket& p)
       return r;
     } else {
       getTSIGHashEnum(trc.d_algoName, p.d_tsig_algo);
+/**
+ * GSS-TSIG 扩展了 TSIG，使其支持 GSS-API（Generic Security Services API），可以使用更强的认证机制，比如 Kerberos V5
+ * 主要用于 Windows AD（Active Directory）环境下的 DNS 服务器与客户端之间的认证，特别是在 动态 DNS 更新（DDNS） 时验证客户端身份
+ * Kerberos V5：提供身份认证（GSS-TSIG 主要基于 Kerberos）。
+ * RFC 3645：正式定义了 GSS-TSIG 协议。
+ * RFC 2845：定义了 TSIG 协议（GSS-TSIG 是它的扩展）。
+ * 主要用于 Windows AD
+ */
 #ifdef ENABLE_GSS_TSIG
       if (g_doGssTSIG && p.d_tsig_algo == TSIG_GSS) {
         GssContext gssctx(keyname);
@@ -1430,16 +1442,18 @@ std::unique_ptr<DNSPacket> PacketHandler::doQuestion(DNSPacket& p)
   try {
 
     // XXX FIXME do this in DNSPacket::parse ?
-
+    g_log << Logger::Debug << "检查该 DNS 包的域名是否合法 (主要检查是否含有 8 bit 的字符)" << endl;
     if(!validDNSName(p.qdomain)) {
       if(d_logDNSDetails)
-        g_log<<Logger::Error<<"Received a malformed qdomain from "<<p.getRemoteString()<<", '"<<p.qdomain<<"': sending servfail"<<endl;
+        g_log << Logger::Error << "Received a malformed qdomain from " << p.getRemoteString()<<", '" << p.qdomain << "': sending servfail" << endl;
       S.inc("corrupt-packets");
       S.ringAccount("remotes-corrupt", p.getInnerRemote());
       S.inc("servfail-packets");
       r->setRcode(RCode::ServFail);
       return r;
     }
+    
+    g_log << Logger::Debug << "检查该 DNS 包的 opcode 是否合法 " << p.d.opcode << endl;
     if(p.d.opcode) { // non-zero opcode (again thanks RA!)
       if(p.d.opcode==Opcode::Update) {
         S.inc("dnsupdate-queries");
@@ -1463,7 +1477,7 @@ std::unique_ptr<DNSPacket> PacketHandler::doQuestion(DNSPacket& p)
         return nullptr;
       }
 
-      g_log<<Logger::Error<<"Received an unknown opcode "<<p.d.opcode<<" from "<<p.getRemoteString()<<" for "<<p.qdomain<<endl;
+      g_log << Logger::Error << "Received an unknown opcode " << p.d.opcode << " from " << p.getRemoteString() << " for " << p.qdomain << endl;
 
       r->setRcode(RCode::NotImp);
       return r;
@@ -1513,7 +1527,7 @@ std::unique_ptr<DNSPacket> PacketHandler::doQuestion(DNSPacket& p)
     }
 
     if(!B.getAuth(target, p.qtype, &d_sd)) {
-      DLOG(g_log<<Logger::Error<<"We have no authority over zone '"<<target<<"'"<<endl);
+      g_log << Logger::Error << "We have no authority over zone '" << target << "'" << endl;
       if(!retargetcount) {
         r->setA(false); // drop AA if we never had a SOA in the first place
         r->setRcode(RCode::Refused); // send REFUSED - but only on empty 'no idea'
@@ -1841,5 +1855,4 @@ std::unique_ptr<DNSPacket> PacketHandler::doQuestion(DNSPacket& p)
     S.ringAccount("servfail-queries", p.qdomain, p.qtype);
   }
   return r;
-
 }

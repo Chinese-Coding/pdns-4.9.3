@@ -171,6 +171,7 @@ void BackendMakerClass::launch(const string& instr)
         throw ArgException("Trying to launch unknown backend '" + module + "'");
       }
     }
+    g_log << Logger::Info << "加载" << module << endl;
     d_repository[module]->declareArguments(name);
     d_instances.emplace_back(module, name);
   }

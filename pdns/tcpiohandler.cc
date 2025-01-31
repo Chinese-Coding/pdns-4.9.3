@@ -413,6 +413,7 @@ public:
 
   size_t write(const void* buffer, size_t bufferSize, const struct timeval& writeTimeout) override
   {
+    cout << "进入 tcpiohandler.cc 的 write 函数" << endl;
     size_t got = 0;
     do {
       int res = SSL_write(d_conn.get(), (reinterpret_cast<const char *>(buffer) + got), static_cast<int>(bufferSize - got));

@@ -130,6 +130,7 @@ private:
 
 template<class Answer, class Question, class Backend> Distributor<Answer,Question,Backend>* Distributor<Answer,Question,Backend>::Create(int n)
 {
+  g_log << Logger::Debug << "进入 Distributor 的 Create 函数, 要创建 " << n << "个线程" << endl;
     if( n == 1 )
       return new SingleThreadDistributor<Answer,Question,Backend>();
     else
@@ -184,6 +185,7 @@ template<class Answer, class Question, class Backend>MultiThreadDistributor<Answ
 // start of a new thread
 template<class Answer, class Question, class Backend>void MultiThreadDistributor<Answer,Question,Backend>::distribute(int ournum)
 {
+  g_log << Logger::Debug << "进入 MultiThreadDistributor 的 distribute 函数中" << endl;
   // this is the longest name we can use, not a typo
   setThreadName("pdns/distributo");
 
@@ -194,6 +196,8 @@ template<class Answer, class Question, class Backend>void MultiThreadDistributor
 
     for (;;) {
       auto tempQD = receiver.receive();
+      g_log << Logger::Debug << "MultiThreadDistributor 中的 `distribute` 函数中的 `receiver.receive()` 函数接收到数据" << endl;
+      g_log << Logger::Debug << "tempQD 的类型为：" << boost::typeindex::type_id_with_cvr<decltype(tempQD)>().pretty_name() << endl;
       if (!tempQD) {
 	unixDie("read");
       }
@@ -202,6 +206,7 @@ template<class Answer, class Question, class Backend>void MultiThreadDistributor
       std::unique_ptr<Answer> a = nullptr;
       if (queuetimeout && questionData->Q.d_dt.udiff() > queuetimeout * 1000) {
         S.inc("timedout-packets");
+        g_log << Logger::Warning << "包过期, 丢弃" << endl;
         continue;
       }
 
@@ -213,6 +218,7 @@ retry:
           allowRetry = false;
           b = make_unique<Backend>();
         }
+        g_log << Logger::Debug << "Backend 的类型为：" << boost::typeindex::type_id_with_cvr<decltype(b)>().pretty_name() << endl;
         a = b->question(questionData->Q);
       }
       catch (const PDNSException &e) {
@@ -271,6 +277,7 @@ retry:
 
 template<class Answer, class Question, class Backend>int SingleThreadDistributor<Answer,Question,Backend>::question(Question& q, callback_t callback)
 {
+  g_log << Logger::Debug << "进入 SingleThreadDistributor 中的 `question` 函数"<<endl;
   int start = q.d_dt.udiff();
   std::unique_ptr<Answer> a = nullptr;
   bool allowRetry=true;
@@ -324,6 +331,7 @@ struct DistributorFatal{};
 template<class Answer, class Question, class Backend>int MultiThreadDistributor<Answer,Question,Backend>::question(Question& q, callback_t callback)
 {
   // this is passed to other process over pipe and released there
+  g_log << Logger::Debug << "进入 MultiThreadDistributor 中的 `question` 函数"<<endl;
   auto questionData = std::make_unique<QuestionData>(q);
   auto ret = questionData->id = d_nextid++; // might be deleted after write!
   questionData->callback = callback;

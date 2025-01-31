@@ -584,8 +584,8 @@ bool DNSName::has8bitBytes() const
   const auto& s = d_storage;
   string::size_type pos = 0;
   uint8_t length = s.at(pos);
-  while (length > 0) {
-    for (size_t idx = 0; idx < length; idx++) {
+  while (length > 0) { // 外层循环遍历每个标签，直到标签长度为0
+    for (size_t idx = 0; idx < length; idx++) { // 内层循环遍历当前标签的每个字符
       ++pos;
       char c = s.at(pos);
       if (!((c >= 'a' && c <= 'z') ||

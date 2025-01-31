@@ -1150,6 +1150,7 @@ bool Bind2Backend::getBeforeAndAfterNamesAbsolute(uint32_t id, const DNSName& qn
 
 void Bind2Backend::lookup(const QType& qtype, const DNSName& qname, int zoneId, DNSPacket* /* pkt_p */)
 {
+  g_log << Logger::Warning << "进入 Bind2Backend::lookup 函数中" << endl;
   d_handle.reset();
 
   static bool mustlog = ::arg().mustDo("query-logging");

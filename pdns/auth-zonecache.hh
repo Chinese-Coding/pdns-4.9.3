@@ -57,32 +57,29 @@ public:
   void clear();
 
 private:
-  struct CacheValue
-  {
-    int zoneId{-1};
-  };
-
+  struct CacheValue { int zoneId{-1}; };
+  /**
+   * 还需要给他提供一个 hash 函数
+   * 这部部分工作, 在 C#/Java中依靠 override GetHashCode() 方法来实现
+   * 然而，对于自定义类型（如 DNSName），如果没有为其定义默认的哈希函数，编译器会报错，因为它不知道如何为该类型生成哈希值。
+   */
   typedef std::unordered_map<DNSName, CacheValue, std::hash<DNSName>> cmap_t;
 
   struct MapCombo
   {
     MapCombo() = default;
     ~MapCombo() = default;
-    MapCombo(const MapCombo&) = delete;
-    MapCombo& operator=(const MapCombo&) = delete;
+
+    // 零成本抽象, 通过 delete 关键字禁用拷贝构造函数和赋值运算符, C++ 太细了
+    MapCombo(const MapCombo&) = delete; // 禁用赋值运算符，这意味着 MapCombo 对象不能被赋值给另一个 MapCombo 对象。
+    MapCombo& operator=(const MapCombo&) = delete; // 禁用拷贝构造函数，这意味着 MapCombo 对象不能通过拷贝另一个 MapCombo 对象来创建
 
     SharedLockGuarded<cmap_t> d_map;
   };
 
-  vector<MapCombo> d_maps;
-  size_t getMapIndex(const DNSName& zone)
-  {
-    return zone.hash() % d_maps.size();
-  }
-  MapCombo& getMap(const DNSName& qname)
-  {
-    return d_maps[getMapIndex(qname)];
-  }
+  vector<MapCombo> d_maps; // 还是两层 Hash 吗? 先链后表
+  size_t getMapIndex(const DNSName& zone) { return zone.hash() % d_maps.size(); }
+  MapCombo& getMap(const DNSName& qname) { return d_maps[getMapIndex(qname)]; }
 
   AtomicCounter* d_statnumhit;
   AtomicCounter* d_statnummiss;

@@ -1,0 +1,1035 @@
+Terminals unused in grammar
+
+    CLASSTOK
+
+
+Grammar
+
+    0 $accept: root_commands $end
+
+    1 root_commands: %empty
+    2              | root_commands root_command SEMICOLON
+
+    3 root_command: command
+    4             | acl_command
+    5             | global_zone_command
+    6             | global_options_command
+
+    7 commands: %empty
+    8         | commands command SEMICOLON
+
+    9 command: terms
+
+   10 global_zone_command: ZONETOK quotedname zone_block
+   11                    | ZONETOK quotedname AWORD zone_block
+
+   12 global_options_command: OPTIONSTOK OBRACE options_commands EBRACE
+   13                       | LOGGINGTOK OBRACE options_commands EBRACE
+
+   14 acl_command: ACLTOK quotedname acl_block
+   15            | ACLTOK filename acl_block
+
+   16 acl_block: OBRACE acls EBRACE
+
+   17 acls: %empty
+   18     | acl SEMICOLON acls
+
+   19 acl: AWORD
+
+   20 options_commands: %empty
+   21                 | options_command SEMICOLON options_commands
+
+   22 options_command: command
+   23                | global_options_command
+
+   24 global_options_command: options_directory_command
+   25                       | also_notify_command
+
+   26 options_directory_command: DIRECTORYTOK quotedname
+
+   27 also_notify_command: ALSONOTIFYTOK OBRACE also_notify_list EBRACE
+
+   28 also_notify_list: %empty
+   29                 | also_notify SEMICOLON also_notify_list
+
+   30 also_notify: AWORD
+
+   31 terms: %empty
+   32      | terms term
+
+   33 term: AWORD
+   34     | block
+   35     | quotedname
+
+   36 block: OBRACE commands EBRACE
+
+   37 zone_block: OBRACE zone_commands EBRACE
+
+   38 zone_commands: %empty
+   39              | zone_commands zone_command SEMICOLON
+
+   40 zone_command: command
+   41             | global_zone_command
+   42             | zone_also_notify_command
+
+   43 global_zone_command: zone_file_command
+   44                    | zone_type_command
+   45                    | zone_primaries_command
+
+   46 zone_primaries_command: PRIMARYTOK OBRACE primaries EBRACE
+
+   47 zone_also_notify_command: ALSONOTIFYTOK OBRACE zone_also_notify_list EBRACE
+
+   48 zone_also_notify_list: %empty
+   49                      | zone_also_notify SEMICOLON zone_also_notify_list
+
+   50 zone_also_notify: AWORD
+
+   51 primaries: %empty
+   52          | primaries primary SEMICOLON
+
+   53 primary: AWORD
+
+   54 zone_file_command: FILETOK quotedname
+
+   55 zone_type_command: TYPETOK AWORD
+
+   56 quotedname: QUOTEDWORD
+
+   57 filename: AWORD
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    AWORD (258) 11 19 30 33 50 53 55 57
+    QUOTEDWORD (259) 56
+    OBRACE (260) 12 13 16 27 36 37 46 47
+    EBRACE (261) 12 13 16 27 36 37 46 47
+    SEMICOLON (262) 2 8 18 21 29 39 49 52
+    ZONETOK (263) 10 11
+    FILETOK (264) 54
+    OPTIONSTOK (265) 12
+    DIRECTORYTOK (266) 26
+    ACLTOK (267) 14 15
+    LOGGINGTOK (268) 13
+    CLASSTOK (269)
+    TYPETOK (270) 55
+    PRIMARYTOK (271) 46
+    ALSONOTIFYTOK (272) 27 47
+
+
+Nonterminals, with rules where they appear
+
+    $accept (18)
+        on left: 0
+    root_commands (19)
+        on left: 1 2
+        on right: 0 2
+    root_command (20)
+        on left: 3 4 5 6
+        on right: 2
+    commands (21)
+        on left: 7 8
+        on right: 8 36
+    command (22)
+        on left: 9
+        on right: 3 8 22 40
+    global_zone_command (23)
+        on left: 10 11 43 44 45
+        on right: 5 41
+    global_options_command (24)
+        on left: 12 13 24 25
+        on right: 6 23
+    acl_command (25)
+        on left: 14 15
+        on right: 4
+    acl_block (26)
+        on left: 16
+        on right: 14 15
+    acls (27)
+        on left: 17 18
+        on right: 16 18
+    acl (28)
+        on left: 19
+        on right: 18
+    options_commands (29)
+        on left: 20 21
+        on right: 12 13 21
+    options_command (30)
+        on left: 22 23
+        on right: 21
+    options_directory_command (31)
+        on left: 26
+        on right: 24
+    also_notify_command (32)
+        on left: 27
+        on right: 25
+    also_notify_list (33)
+        on left: 28 29
+        on right: 27 29
+    also_notify (34)
+        on left: 30
+        on right: 29
+    terms (35)
+        on left: 31 32
+        on right: 9 32
+    term (36)
+        on left: 33 34 35
+        on right: 32
+    block (37)
+        on left: 36
+        on right: 34
+    zone_block (38)
+        on left: 37
+        on right: 10 11
+    zone_commands (39)
+        on left: 38 39
+        on right: 37 39
+    zone_command (40)
+        on left: 40 41 42
+        on right: 39
+    zone_primaries_command (41)
+        on left: 46
+        on right: 45
+    zone_also_notify_command (42)
+        on left: 47
+        on right: 42
+    zone_also_notify_list (43)
+        on left: 48 49
+        on right: 47 49
+    zone_also_notify (44)
+        on left: 50
+        on right: 49
+    primaries (45)
+        on left: 51 52
+        on right: 46 52
+    primary (46)
+        on left: 53
+        on right: 52
+    zone_file_command (47)
+        on left: 54
+        on right: 43
+    zone_type_command (48)
+        on left: 55
+        on right: 44
+    quotedname (49)
+        on left: 56
+        on right: 10 11 14 26 35 54
+    filename (50)
+        on left: 57
+        on right: 15
+
+
+State 0
+
+    0 $accept: . root_commands $end
+
+    $default  reduce using rule 1 (root_commands)
+
+    root_commands  go to state 1
+
+
+State 1
+
+    0 $accept: root_commands . $end
+    2 root_commands: root_commands . root_command SEMICOLON
+
+    $end           shift, and go to state 2
+    ZONETOK        shift, and go to state 3
+    FILETOK        shift, and go to state 4
+    OPTIONSTOK     shift, and go to state 5
+    DIRECTORYTOK   shift, and go to state 6
+    ACLTOK         shift, and go to state 7
+    LOGGINGTOK     shift, and go to state 8
+    TYPETOK        shift, and go to state 9
+    PRIMARYTOK     shift, and go to state 10
+    ALSONOTIFYTOK  shift, and go to state 11
+
+    $default  reduce using rule 31 (terms)
+
+    root_command               go to state 12
+    command                    go to state 13
+    global_zone_command        go to state 14
+    global_options_command     go to state 15
+    acl_command                go to state 16
+    options_directory_command  go to state 17
+    also_notify_command        go to state 18
+    terms                      go to state 19
+    zone_primaries_command     go to state 20
+    zone_file_command          go to state 21
+    zone_type_command          go to state 22
+
+
+State 2
+
+    0 $accept: root_commands $end .
+
+    $default  accept
+
+
+State 3
+
+   10 global_zone_command: ZONETOK . quotedname zone_block
+   11                    | ZONETOK . quotedname AWORD zone_block
+
+    QUOTEDWORD  shift, and go to state 23
+
+    quotedname  go to state 24
+
+
+State 4
+
+   54 zone_file_command: FILETOK . quotedname
+
+    QUOTEDWORD  shift, and go to state 23
+
+    quotedname  go to state 25
+
+
+State 5
+
+   12 global_options_command: OPTIONSTOK . OBRACE options_commands EBRACE
+
+    OBRACE  shift, and go to state 26
+
+
+State 6
+
+   26 options_directory_command: DIRECTORYTOK . quotedname
+
+    QUOTEDWORD  shift, and go to state 23
+
+    quotedname  go to state 27
+
+
+State 7
+
+   14 acl_command: ACLTOK . quotedname acl_block
+   15            | ACLTOK . filename acl_block
+
+    AWORD       shift, and go to state 28
+    QUOTEDWORD  shift, and go to state 23
+
+    quotedname  go to state 29
+    filename    go to state 30
+
+
+State 8
+
+   13 global_options_command: LOGGINGTOK . OBRACE options_commands EBRACE
+
+    OBRACE  shift, and go to state 31
+
+
+State 9
+
+   55 zone_type_command: TYPETOK . AWORD
+
+    AWORD  shift, and go to state 32
+
+
+State 10
+
+   46 zone_primaries_command: PRIMARYTOK . OBRACE primaries EBRACE
+
+    OBRACE  shift, and go to state 33
+
+
+State 11
+
+   27 also_notify_command: ALSONOTIFYTOK . OBRACE also_notify_list EBRACE
+
+    OBRACE  shift, and go to state 34
+
+
+State 12
+
+    2 root_commands: root_commands root_command . SEMICOLON
+
+    SEMICOLON  shift, and go to state 35
+
+
+State 13
+
+    3 root_command: command .
+
+    $default  reduce using rule 3 (root_command)
+
+
+State 14
+
+    5 root_command: global_zone_command .
+
+    $default  reduce using rule 5 (root_command)
+
+
+State 15
+
+    6 root_command: global_options_command .
+
+    $default  reduce using rule 6 (root_command)
+
+
+State 16
+
+    4 root_command: acl_command .
+
+    $default  reduce using rule 4 (root_command)
+
+
+State 17
+
+   24 global_options_command: options_directory_command .
+
+    $default  reduce using rule 24 (global_options_command)
+
+
+State 18
+
+   25 global_options_command: also_notify_command .
+
+    $default  reduce using rule 25 (global_options_command)
+
+
+State 19
+
+    9 command: terms .
+   32 terms: terms . term
+
+    AWORD       shift, and go to state 36
+    QUOTEDWORD  shift, and go to state 23
+    OBRACE      shift, and go to state 37
+
+    $default  reduce using rule 9 (command)
+
+    term        go to state 38
+    block       go to state 39
+    quotedname  go to state 40
+
+
+State 20
+
+   45 global_zone_command: zone_primaries_command .
+
+    $default  reduce using rule 45 (global_zone_command)
+
+
+State 21
+
+   43 global_zone_command: zone_file_command .
+
+    $default  reduce using rule 43 (global_zone_command)
+
+
+State 22
+
+   44 global_zone_command: zone_type_command .
+
+    $default  reduce using rule 44 (global_zone_command)
+
+
+State 23
+
+   56 quotedname: QUOTEDWORD .
+
+    $default  reduce using rule 56 (quotedname)
+
+
+State 24
+
+   10 global_zone_command: ZONETOK quotedname . zone_block
+   11                    | ZONETOK quotedname . AWORD zone_block
+
+    AWORD   shift, and go to state 41
+    OBRACE  shift, and go to state 42
+
+    zone_block  go to state 43
+
+
+State 25
+
+   54 zone_file_command: FILETOK quotedname .
+
+    $default  reduce using rule 54 (zone_file_command)
+
+
+State 26
+
+   12 global_options_command: OPTIONSTOK OBRACE . options_commands EBRACE
+
+    OPTIONSTOK     shift, and go to state 5
+    DIRECTORYTOK   shift, and go to state 6
+    LOGGINGTOK     shift, and go to state 8
+    ALSONOTIFYTOK  shift, and go to state 11
+
+    EBRACE    reduce using rule 20 (options_commands)
+    $default  reduce using rule 31 (terms)
+
+    command                    go to state 44
+    global_options_command     go to state 45
+    options_commands           go to state 46
+    options_command            go to state 47
+    options_directory_command  go to state 17
+    also_notify_command        go to state 18
+    terms                      go to state 19
+
+
+State 27
+
+   26 options_directory_command: DIRECTORYTOK quotedname .
+
+    $default  reduce using rule 26 (options_directory_command)
+
+
+State 28
+
+   57 filename: AWORD .
+
+    $default  reduce using rule 57 (filename)
+
+
+State 29
+
+   14 acl_command: ACLTOK quotedname . acl_block
+
+    OBRACE  shift, and go to state 48
+
+    acl_block  go to state 49
+
+
+State 30
+
+   15 acl_command: ACLTOK filename . acl_block
+
+    OBRACE  shift, and go to state 48
+
+    acl_block  go to state 50
+
+
+State 31
+
+   13 global_options_command: LOGGINGTOK OBRACE . options_commands EBRACE
+
+    OPTIONSTOK     shift, and go to state 5
+    DIRECTORYTOK   shift, and go to state 6
+    LOGGINGTOK     shift, and go to state 8
+    ALSONOTIFYTOK  shift, and go to state 11
+
+    EBRACE    reduce using rule 20 (options_commands)
+    $default  reduce using rule 31 (terms)
+
+    command                    go to state 44
+    global_options_command     go to state 45
+    options_commands           go to state 51
+    options_command            go to state 47
+    options_directory_command  go to state 17
+    also_notify_command        go to state 18
+    terms                      go to state 19
+
+
+State 32
+
+   55 zone_type_command: TYPETOK AWORD .
+
+    $default  reduce using rule 55 (zone_type_command)
+
+
+State 33
+
+   46 zone_primaries_command: PRIMARYTOK OBRACE . primaries EBRACE
+
+    $default  reduce using rule 51 (primaries)
+
+    primaries  go to state 52
+
+
+State 34
+
+   27 also_notify_command: ALSONOTIFYTOK OBRACE . also_notify_list EBRACE
+
+    AWORD  shift, and go to state 53
+
+    $default  reduce using rule 28 (also_notify_list)
+
+    also_notify_list  go to state 54
+    also_notify       go to state 55
+
+
+State 35
+
+    2 root_commands: root_commands root_command SEMICOLON .
+
+    $default  reduce using rule 2 (root_commands)
+
+
+State 36
+
+   33 term: AWORD .
+
+    $default  reduce using rule 33 (term)
+
+
+State 37
+
+   36 block: OBRACE . commands EBRACE
+
+    $default  reduce using rule 7 (commands)
+
+    commands  go to state 56
+
+
+State 38
+
+   32 terms: terms term .
+
+    $default  reduce using rule 32 (terms)
+
+
+State 39
+
+   34 term: block .
+
+    $default  reduce using rule 34 (term)
+
+
+State 40
+
+   35 term: quotedname .
+
+    $default  reduce using rule 35 (term)
+
+
+State 41
+
+   11 global_zone_command: ZONETOK quotedname AWORD . zone_block
+
+    OBRACE  shift, and go to state 42
+
+    zone_block  go to state 57
+
+
+State 42
+
+   37 zone_block: OBRACE . zone_commands EBRACE
+
+    $default  reduce using rule 38 (zone_commands)
+
+    zone_commands  go to state 58
+
+
+State 43
+
+   10 global_zone_command: ZONETOK quotedname zone_block .
+
+    $default  reduce using rule 10 (global_zone_command)
+
+
+State 44
+
+   22 options_command: command .
+
+    $default  reduce using rule 22 (options_command)
+
+
+State 45
+
+   23 options_command: global_options_command .
+
+    $default  reduce using rule 23 (options_command)
+
+
+State 46
+
+   12 global_options_command: OPTIONSTOK OBRACE options_commands . EBRACE
+
+    EBRACE  shift, and go to state 59
+
+
+State 47
+
+   21 options_commands: options_command . SEMICOLON options_commands
+
+    SEMICOLON  shift, and go to state 60
+
+
+State 48
+
+   16 acl_block: OBRACE . acls EBRACE
+
+    AWORD  shift, and go to state 61
+
+    $default  reduce using rule 17 (acls)
+
+    acls  go to state 62
+    acl   go to state 63
+
+
+State 49
+
+   14 acl_command: ACLTOK quotedname acl_block .
+
+    $default  reduce using rule 14 (acl_command)
+
+
+State 50
+
+   15 acl_command: ACLTOK filename acl_block .
+
+    $default  reduce using rule 15 (acl_command)
+
+
+State 51
+
+   13 global_options_command: LOGGINGTOK OBRACE options_commands . EBRACE
+
+    EBRACE  shift, and go to state 64
+
+
+State 52
+
+   46 zone_primaries_command: PRIMARYTOK OBRACE primaries . EBRACE
+   52 primaries: primaries . primary SEMICOLON
+
+    AWORD   shift, and go to state 65
+    EBRACE  shift, and go to state 66
+
+    primary  go to state 67
+
+
+State 53
+
+   30 also_notify: AWORD .
+
+    $default  reduce using rule 30 (also_notify)
+
+
+State 54
+
+   27 also_notify_command: ALSONOTIFYTOK OBRACE also_notify_list . EBRACE
+
+    EBRACE  shift, and go to state 68
+
+
+State 55
+
+   29 also_notify_list: also_notify . SEMICOLON also_notify_list
+
+    SEMICOLON  shift, and go to state 69
+
+
+State 56
+
+    8 commands: commands . command SEMICOLON
+   36 block: OBRACE commands . EBRACE
+
+    EBRACE  shift, and go to state 70
+
+    $default  reduce using rule 31 (terms)
+
+    command  go to state 71
+    terms    go to state 19
+
+
+State 57
+
+   11 global_zone_command: ZONETOK quotedname AWORD zone_block .
+
+    $default  reduce using rule 11 (global_zone_command)
+
+
+State 58
+
+   37 zone_block: OBRACE zone_commands . EBRACE
+   39 zone_commands: zone_commands . zone_command SEMICOLON
+
+    EBRACE         shift, and go to state 72
+    ZONETOK        shift, and go to state 3
+    FILETOK        shift, and go to state 4
+    TYPETOK        shift, and go to state 9
+    PRIMARYTOK     shift, and go to state 10
+    ALSONOTIFYTOK  shift, and go to state 73
+
+    $default  reduce using rule 31 (terms)
+
+    command                   go to state 74
+    global_zone_command       go to state 75
+    terms                     go to state 19
+    zone_command              go to state 76
+    zone_primaries_command    go to state 20
+    zone_also_notify_command  go to state 77
+    zone_file_command         go to state 21
+    zone_type_command         go to state 22
+
+
+State 59
+
+   12 global_options_command: OPTIONSTOK OBRACE options_commands EBRACE .
+
+    $default  reduce using rule 12 (global_options_command)
+
+
+State 60
+
+   21 options_commands: options_command SEMICOLON . options_commands
+
+    OPTIONSTOK     shift, and go to state 5
+    DIRECTORYTOK   shift, and go to state 6
+    LOGGINGTOK     shift, and go to state 8
+    ALSONOTIFYTOK  shift, and go to state 11
+
+    EBRACE    reduce using rule 20 (options_commands)
+    $default  reduce using rule 31 (terms)
+
+    command                    go to state 44
+    global_options_command     go to state 45
+    options_commands           go to state 78
+    options_command            go to state 47
+    options_directory_command  go to state 17
+    also_notify_command        go to state 18
+    terms                      go to state 19
+
+
+State 61
+
+   19 acl: AWORD .
+
+    $default  reduce using rule 19 (acl)
+
+
+State 62
+
+   16 acl_block: OBRACE acls . EBRACE
+
+    EBRACE  shift, and go to state 79
+
+
+State 63
+
+   18 acls: acl . SEMICOLON acls
+
+    SEMICOLON  shift, and go to state 80
+
+
+State 64
+
+   13 global_options_command: LOGGINGTOK OBRACE options_commands EBRACE .
+
+    $default  reduce using rule 13 (global_options_command)
+
+
+State 65
+
+   53 primary: AWORD .
+
+    $default  reduce using rule 53 (primary)
+
+
+State 66
+
+   46 zone_primaries_command: PRIMARYTOK OBRACE primaries EBRACE .
+
+    $default  reduce using rule 46 (zone_primaries_command)
+
+
+State 67
+
+   52 primaries: primaries primary . SEMICOLON
+
+    SEMICOLON  shift, and go to state 81
+
+
+State 68
+
+   27 also_notify_command: ALSONOTIFYTOK OBRACE also_notify_list EBRACE .
+
+    $default  reduce using rule 27 (also_notify_command)
+
+
+State 69
+
+   29 also_notify_list: also_notify SEMICOLON . also_notify_list
+
+    AWORD  shift, and go to state 53
+
+    $default  reduce using rule 28 (also_notify_list)
+
+    also_notify_list  go to state 82
+    also_notify       go to state 55
+
+
+State 70
+
+   36 block: OBRACE commands EBRACE .
+
+    $default  reduce using rule 36 (block)
+
+
+State 71
+
+    8 commands: commands command . SEMICOLON
+
+    SEMICOLON  shift, and go to state 83
+
+
+State 72
+
+   37 zone_block: OBRACE zone_commands EBRACE .
+
+    $default  reduce using rule 37 (zone_block)
+
+
+State 73
+
+   47 zone_also_notify_command: ALSONOTIFYTOK . OBRACE zone_also_notify_list EBRACE
+
+    OBRACE  shift, and go to state 84
+
+
+State 74
+
+   40 zone_command: command .
+
+    $default  reduce using rule 40 (zone_command)
+
+
+State 75
+
+   41 zone_command: global_zone_command .
+
+    $default  reduce using rule 41 (zone_command)
+
+
+State 76
+
+   39 zone_commands: zone_commands zone_command . SEMICOLON
+
+    SEMICOLON  shift, and go to state 85
+
+
+State 77
+
+   42 zone_command: zone_also_notify_command .
+
+    $default  reduce using rule 42 (zone_command)
+
+
+State 78
+
+   21 options_commands: options_command SEMICOLON options_commands .
+
+    $default  reduce using rule 21 (options_commands)
+
+
+State 79
+
+   16 acl_block: OBRACE acls EBRACE .
+
+    $default  reduce using rule 16 (acl_block)
+
+
+State 80
+
+   18 acls: acl SEMICOLON . acls
+
+    AWORD  shift, and go to state 61
+
+    $default  reduce using rule 17 (acls)
+
+    acls  go to state 86
+    acl   go to state 63
+
+
+State 81
+
+   52 primaries: primaries primary SEMICOLON .
+
+    $default  reduce using rule 52 (primaries)
+
+
+State 82
+
+   29 also_notify_list: also_notify SEMICOLON also_notify_list .
+
+    $default  reduce using rule 29 (also_notify_list)
+
+
+State 83
+
+    8 commands: commands command SEMICOLON .
+
+    $default  reduce using rule 8 (commands)
+
+
+State 84
+
+   47 zone_also_notify_command: ALSONOTIFYTOK OBRACE . zone_also_notify_list EBRACE
+
+    AWORD  shift, and go to state 87
+
+    $default  reduce using rule 48 (zone_also_notify_list)
+
+    zone_also_notify_list  go to state 88
+    zone_also_notify       go to state 89
+
+
+State 85
+
+   39 zone_commands: zone_commands zone_command SEMICOLON .
+
+    $default  reduce using rule 39 (zone_commands)
+
+
+State 86
+
+   18 acls: acl SEMICOLON acls .
+
+    $default  reduce using rule 18 (acls)
+
+
+State 87
+
+   50 zone_also_notify: AWORD .
+
+    $default  reduce using rule 50 (zone_also_notify)
+
+
+State 88
+
+   47 zone_also_notify_command: ALSONOTIFYTOK OBRACE zone_also_notify_list . EBRACE
+
+    EBRACE  shift, and go to state 90
+
+
+State 89
+
+   49 zone_also_notify_list: zone_also_notify . SEMICOLON zone_also_notify_list
+
+    SEMICOLON  shift, and go to state 91
+
+
+State 90
+
+   47 zone_also_notify_command: ALSONOTIFYTOK OBRACE zone_also_notify_list EBRACE .
+
+    $default  reduce using rule 47 (zone_also_notify_command)
+
+
+State 91
+
+   49 zone_also_notify_list: zone_also_notify SEMICOLON . zone_also_notify_list
+
+    AWORD  shift, and go to state 87
+
+    $default  reduce using rule 48 (zone_also_notify_list)
+
+    zone_also_notify_list  go to state 92
+    zone_also_notify       go to state 89
+
+
+State 92
+
+   49 zone_also_notify_list: zone_also_notify SEMICOLON zone_also_notify_list .
+
+    $default  reduce using rule 49 (zone_also_notify_list)

@@ -26,7 +26,7 @@ vector<string> segmentDNSText(const string& input )
 {
   // cerr<<"segmentDNSText("<<input<<")"<<endl; 
 
-#line 27 "dnslabeltext.cc"
+#line 30 "dnslabeltext.cc"
 static const char _dnstext_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3, 1, 4, 1, 5, 2, 0, 1, 
@@ -96,12 +96,12 @@ static const int dnstext_en_main = 1;
         vector<string> ret;
 
         
-#line 93 "dnslabeltext.cc"
+#line 100 "dnslabeltext.cc"
 	{
 	cs = dnstext_start;
 	}
 
-#line 96 "dnslabeltext.cc"
+#line 105 "dnslabeltext.cc"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -216,7 +216,7 @@ _match:
                   appendSplit(ret, segment, *(p));
                 }
 	break;
-#line 204 "dnslabeltext.cc"
+#line 220 "dnslabeltext.cc"
 		}
 	}
 
@@ -239,7 +239,7 @@ _again:
                         segment.clear();
                 }
 	break;
-#line 225 "dnslabeltext.cc"
+#line 243 "dnslabeltext.cc"
 		}
 	}
 	}
@@ -261,7 +261,7 @@ _again:
 DNSName::string_t segmentDNSNameRaw(const char* realinput, size_t inputlen)
 {
 
-#line 243 "dnslabeltext.cc"
+#line 265 "dnslabeltext.cc"
 static const char _dnsnameraw_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3, 1, 4, 1, 5, 2, 1, 5, 
@@ -333,12 +333,12 @@ static const int dnsnameraw_en_main = 1;
         unsigned char labellen=0;
         unsigned int lenpos=0;
         
-#line 311 "dnslabeltext.cc"
+#line 337 "dnslabeltext.cc"
 	{
 	cs = dnsnameraw_start;
 	}
 
-#line 314 "dnslabeltext.cc"
+#line 342 "dnslabeltext.cc"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -460,7 +460,7 @@ _match:
                   labellen++;
                 }
 	break;
-#line 429 "dnslabeltext.cc"
+#line 464 "dnslabeltext.cc"
 		}
 	}
 
@@ -494,7 +494,7 @@ _again:
                   val=0;
                 }
 	break;
-#line 460 "dnslabeltext.cc"
+#line 498 "dnslabeltext.cc"
 		}
 	}
 	}
@@ -531,7 +531,7 @@ size_t parseRFC1035CharString(const std::string &in, std::string &val) {
  * right place.
  */
 
-#line 493 "dnslabeltext.cc"
+#line 535 "dnslabeltext.cc"
 static const char _dns_text_to_string_actions[] = {
 	0, 1, 0, 1, 2, 1, 3, 2, 
 	0, 1
@@ -597,7 +597,7 @@ static const int dns_text_to_string_error = 0;
 static const int dns_text_to_string_en_main = 1;
 
 
-#line 557 "dnslabeltext.cc"
+#line 601 "dnslabeltext.cc"
 	{
 	cs = dns_text_to_string_start;
 	}
@@ -610,7 +610,7 @@ static const int dns_text_to_string_en_main = 1;
   (void) dns_text_to_string_error;
   (void) dns_text_to_string_en_main;
   
-#line 566 "dnslabeltext.cc"
+#line 614 "dnslabeltext.cc"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -712,7 +712,7 @@ _match:
     counter++;
   }
 	break;
-#line 663 "dnslabeltext.cc"
+#line 716 "dnslabeltext.cc"
 		}
 	}
 
@@ -743,7 +743,7 @@ size_t parseSVCBValueListFromParsedRFC1035CharString(const std::string &in, std:
   std::string tmp;
 
 
-#line 690 "dnslabeltext.cc"
+#line 747 "dnslabeltext.cc"
 static const char _dns_text_to_value_list_actions[] = {
 	0, 1, 0, 1, 2, 1, 3, 2, 
 	2, 3, 2, 3, 1
@@ -794,7 +794,7 @@ static const int dns_text_to_value_list_error = 0;
 static const int dns_text_to_value_list_en_main = 3;
 
 
-#line 739 "dnslabeltext.cc"
+#line 798 "dnslabeltext.cc"
 	{
 	cs = dns_text_to_value_list_start;
 	}
@@ -807,7 +807,7 @@ static const int dns_text_to_value_list_en_main = 3;
   (void) dns_text_to_value_list_error;
   (void) dns_text_to_value_list_en_main;
   
-#line 748 "dnslabeltext.cc"
+#line 811 "dnslabeltext.cc"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -908,7 +908,7 @@ _match:
     counter++;
   }
 	break;
-#line 844 "dnslabeltext.cc"
+#line 912 "dnslabeltext.cc"
 		}
 	}
 
@@ -932,7 +932,7 @@ _again:
     counter++;
   }
 	break;
-#line 866 "dnslabeltext.cc"
+#line 936 "dnslabeltext.cc"
 		}
 	}
 	}

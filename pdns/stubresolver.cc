@@ -50,9 +50,7 @@ bool resolversDefined()
  */
 static void parseLocalResolvConf_locked(vector<ComboAddress>& resolversForStub, const time_t& now)
 {
-  struct stat statResult
-  {
-  };
+  struct stat statResult { };
   s_localResolvConfLastCheck = now;
 
   if (stat(LOCAL_RESOLV_CONF_PATH, &statResult) != -1) {

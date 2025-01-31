@@ -322,9 +322,7 @@ template <typename T>
 class SharedLockGuardedTryHolder
 {
 public:
-  explicit SharedLockGuardedTryHolder(T& value, std::shared_mutex& mutex): d_lock(mutex, std::try_to_lock), d_value(value)
-  {
-  }
+  explicit SharedLockGuardedTryHolder(T& value, std::shared_mutex& mutex): d_lock(mutex, std::try_to_lock), d_value(value) { }
 
   T& operator*() const {
     if (!owns_lock()) {
@@ -413,13 +411,9 @@ template <typename T>
 class SharedLockGuarded
 {
 public:
-  explicit SharedLockGuarded(const T& value): d_value(value)
-  {
-  }
+  explicit SharedLockGuarded(const T& value): d_value(value) { }
 
-  explicit SharedLockGuarded(T&& value): d_value(std::move(value))
-  {
-  }
+  explicit SharedLockGuarded(T&& value): d_value(std::move(value)) { }
 
   explicit SharedLockGuarded() = default;
 

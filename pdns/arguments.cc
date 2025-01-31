@@ -383,7 +383,7 @@ void ArgvMap::parseOne(const string& arg, const string& parseOnly, bool lax)
   string var;
   string val;
   string::size_type pos = 0;
-  bool incremental = false;
+  bool incremental = false; // 增加的;递增的;
 
   if (arg.find("--") == 0 && (pos = arg.find("+=")) != string::npos) // this is a --port+=25 case
   {
@@ -540,6 +540,7 @@ bool ArgvMap::file(const string& fname, bool lax)
 
 bool ArgvMap::file(const string& fname, bool lax, bool included)
 {
+  // TODO: 要这个东西有什么用吗?
   if (!parmIsset("include-dir")) { // inject include-dir
     set("include-dir", "Directory to include configuration files from");
   }

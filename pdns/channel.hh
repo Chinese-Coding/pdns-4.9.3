@@ -241,15 +241,19 @@ namespace channel
   {
     /* we cannot touch the initial unique pointer after writing to the pipe,
        not even to release it, so let's transfer it to a local object */
+    g_log << Logger::Debug << "进入 Sender 中的 `send` 函数" << endl;
+    // g_log << Logger::Debug << "send 方法中唯一参数的类型为：" << boost::typeindex::type_id_with_cvr<decltype(object)>().pretty_name() << endl;
+
     auto localObj = std::move(object);
     auto ptr = localObj.get();
+    // g_log << Logger::Debug << "ptr 类型为" << boost::typeindex::type_id_with_cvr<decltype(ptr)>().pretty_name() << endl;
     static_assert(sizeof(ptr) <= PIPE_BUF, "Writes up to PIPE_BUF are guaranted not to interleaved and to either fully succeed or fail");
     while (true) {
 #if __SANITIZE_THREAD__
       __tsan_release(ptr);
 #endif /* __SANITIZE_THREAD__ */
       ssize_t sent = write(d_fd.getHandle(), &ptr, sizeof(ptr));
-
+      g_log << Logger::Debug << "Sender 中的 `send` 函数发送数据长度: "<< sent << endl;
       if (sent == sizeof(ptr)) {
         // coverity[leaked_storage]
         localObj.release();
@@ -330,7 +334,7 @@ namespace channel
   std::pair<Sender<T, D>, Receiver<T, D>> createObjectQueue(SenderBlockingMode senderBlockingMode, ReceiverBlockingMode receiverBlockingMode, size_t pipeBufferSize, bool throwOnEOF)
   {
     int fds[2] = {-1, -1};
-    if (pipe(fds) < 0) {
+    if (pipe(fds) < 0) { // 使用 pipe 函数创建一个管道
       throw std::runtime_error("Error creating channel pipe: " + stringerror());
     }
 

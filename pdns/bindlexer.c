@@ -1,5 +1,5 @@
 
-#line 2 "bindlexer.c"
+#line 3 "bindlexer.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -574,10 +574,10 @@ char *original_filename;
 int include_stack_ptr = 0;
 extern const char *bind_directory;
 
-#line 577 "bindlexer.c"
+#line 578 "bindlexer.c"
 
 #define YY_NO_INPUT 1
-#line 580 "bindlexer.c"
+#line 581 "bindlexer.c"
 
 #define INITIAL 0
 #define comment 1
@@ -807,7 +807,7 @@ YY_DECL
 
 
 
-#line 810 "bindlexer.c"
+#line 811 "bindlexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1088,7 +1088,7 @@ YY_RULE_SETUP
 #line 131 "bindlexer.l"
 ECHO;
 	YY_BREAK
-#line 1091 "bindlexer.c"
+#line 1092 "bindlexer.c"
 
 	case YY_END_OF_BUFFER:
 		{

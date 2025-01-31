@@ -1551,6 +1551,7 @@ gid_t strToGID(const string &str)
 
 bool isSettingThreadCPUAffinitySupported()
 {
+// pthread_setaffinity_np 函数用于设置线程的 CPU 亲和性，即指定线程在哪些 CPU 核心上运行
 #ifdef HAVE_PTHREAD_SETAFFINITY_NP
   return true;
 #else

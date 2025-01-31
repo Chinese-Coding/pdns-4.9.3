@@ -88,7 +88,7 @@ autoreconf -vi
 To compile a very clean version, use:
 
 ```sh
-./configure --with-modules="" --disable-lua-records
+./configure --with-modules="bind" --disable-lua-records --enable-dns-over-tls
 make
 # make install
 ```
@@ -105,6 +105,16 @@ To add multiple modules, try:
 ```sh
 ./configure --with-modules="bind gmysql gpgsql"
 ```
+## 我的编译命令
+```sh
+autoreconf -vi
+./configure --with-modules="bind" --disable-lua-records --enable-dns-over-tls
+# 多线程编译
+make -j
+
+pdns/pdns_server --loglevel=8 --log-dns-queries --log-dns-queries --log-dns-details --query-logging
+```
+
 
 Note that you will need the development headers for PostgreSQL as well in this case.
 
@@ -173,3 +183,9 @@ For MySQL support, run `brew install mariadb` and add `--with-modules="gmysql"` 
 Linux notes
 -----------
 None really.
+
+# Boost.Test 有关命令
+```sh
+g++ -std=c++17 -o test-nameserver_cc pdns/test-nameserver_cc.cc -lboost_unit_test_framework
+./test-nameserver_cc
+```

@@ -30,8 +30,7 @@
 #include "cachecleaner.hh"
 extern StatBag S;
 
-AuthZoneCache::AuthZoneCache(size_t mapsCount) :
-  d_maps(mapsCount)
+AuthZoneCache::AuthZoneCache(size_t mapsCount) : d_maps(mapsCount)
 {
   S.declare("zone-cache-hit", "Number of zone cache hits");
   S.declare("zone-cache-miss", "Number of zone cache misses");

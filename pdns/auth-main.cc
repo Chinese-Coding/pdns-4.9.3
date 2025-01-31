@@ -202,6 +202,7 @@ static void declareArguments()
   ::arg().setSwitch("workaround-11804", "Workaround for issue 11804: send single RR per AXFR chunk") = "no";
   ::arg().set("receiver-threads", "Default number of receiver threads to start") = "1";
   ::arg().set("queue-limit", "Maximum number of milliseconds to queue a query") = "1500";
+  // 将此解析器用于 ALIAS 和内部存根解析器
   ::arg().set("resolver", "Use this resolver for ALIAS and the internal stub resolver") = "no";
   ::arg().set("udp-truncation-threshold", "Maximum UDP response size before we truncate") = "1232";
 
@@ -305,6 +306,11 @@ static void declareArguments()
 
   ::arg().setSwitch("expand-alias", "Expand ALIAS records") = "no";
   ::arg().set("outgoing-axfr-expand-alias", "Expand ALIAS records during outgoing AXFR") = "no";
+  /**
+   * 8bit DNS queries 是指在 DNS 查询中使用 8 位字符的查询。在传统的 DNS 查询中，域名通常使用 ASCII 字符集，每个字符占用 7 位。
+   * 然而，随着互联网的发展，一些应用程序和协议开始使用非 ASCII 字符，如 Unicode 字符。
+   * 为了支持这些字符，DNS 协议进行了扩展，允许在查询中使用 8 位字符。
+   */
   ::arg().setSwitch("8bit-dns", "Allow 8bit dns queries") = "no";
 #ifdef HAVE_LUA_RECORDS
   ::arg().setSwitch("enable-lua-records", "Process LUA records for all zones (metadata overrides this)") = "no";
@@ -515,8 +521,8 @@ static int isGuarded(char** argv)
 
 static void sendout(std::unique_ptr<DNSPacket>& a, int start)
 {
-  if (!a)
-    return;
+  g_log << Logger::Debug << "进入 `static void sendout` 函数" << endl;
+  if (!a) return;
 
   try {
     int diff = a->d_dt.udiffNoReset();
@@ -654,15 +660,14 @@ try {
       }
 
       if (logDNSQueries) {
-        if (PC.enabled()) {
+        if (PC.enabled()) 
           g_log << ": packetcache MISS" << endl;
-        }
-        else {
+        else 
           g_log << endl;
-        }
       }
 
       try {
+        g_log << Logger::Debug << "Handing off question to distributor" << endl;
         distributor->question(question, &sendout); // otherwise, give to the distributor
       }
       catch (DistributorFatal& df) { // when this happens, we have leaked loads of memory. Bailing out time.
@@ -783,6 +788,7 @@ static void mainthread()
   Utility::dropUserPrivs(newuid);
 
   if (::arg().mustDo("resolver")) {
+    g_log << Logger::Notice << "Starting DNS resolver" << endl;
     DP = std::make_unique<DNSProxy>(::arg()["resolver"]);
     DP->go();
   }
@@ -795,6 +801,7 @@ static void mainthread()
 
   {
     // Some sanity checking on default key settings
+    g_log << Logger::Notice << "对默认密钥设置进行一些健全性检查" << endl;
     bool hadKeyError = false;
     int kskAlgo{0}, zskAlgo{0};
     for (const string algotype : {"ksk", "zsk"}) {
@@ -856,17 +863,22 @@ static void mainthread()
   s_dynListener->go();
 
   if (::arg().mustDo("webserver") || ::arg().mustDo("api")) {
+    g_log << Logger::Notice << "启动 webserver" << endl;
     webserver.go(S);
   }
 
-  if (::arg().mustDo("primary") || ::arg().mustDo("secondary") || !::arg()["forward-notify"].empty())
+  if (::arg().mustDo("primary") || ::arg().mustDo("secondary") || !::arg()["forward-notify"].empty()) {
+    g_log << Logger::Notice << "启动通知线程" << endl;
     Communicator.go();
+  }
+    
 
   s_tcpNameserver->go(); // tcp nameserver launch
 
   unsigned int max_rthreads = ::arg().asNum("receiver-threads", 1);
   s_distributors.resize(max_rthreads);
   for (unsigned int n = 0; n < max_rthreads; ++n) {
+    g_log << Logger::Notice << "启动接收线程 #" << n << endl;
     std::thread t(qthread, n);
     t.detach();
   }
@@ -1202,6 +1214,7 @@ static void sigTermHandler([[maybe_unused]] int signal)
 //! The main function of pdns, the pdns process
 int main(int argc, char** argv)
 {
+  cout << "进入 main 函数" << endl;
   versionSetProduct(ProductAuthoritative);
   reportAllTypes(); // init MOADNSParser
 
@@ -1442,6 +1455,7 @@ int main(int argc, char** argv)
       char tmp[128];
       if (gethostname(tmp, sizeof(tmp) - 1) == 0) {
         ::arg().set("server-id") = tmp;
+        g_log << Logger::Info << "server-id 设置为 " << tmp << endl;
       }
       else {
         g_log << Logger::Warning << "Unable to get the hostname, NSID and id.server values will be empty: " << stringerror() << endl;
@@ -1467,6 +1481,7 @@ int main(int argc, char** argv)
     }
 
     s_tcpNameserver = make_unique<TCPNameserver>();
+    g_log << Logger::Info << "UDPNameserver 和 TCPNameserver 创建完成, 准备启动" << endl;
   }
   catch (const ArgException& A) {
     g_log << Logger::Error << "Fatal error: " << A.reason << endl;
@@ -1478,6 +1493,7 @@ int main(int argc, char** argv)
   }
 
   try {
+    g_log << Logger::Info << "声明状态监视器" << endl;
     declareStats();
   }
   catch (const PDNSException& PE) {
@@ -1502,6 +1518,7 @@ int main(int argc, char** argv)
   showProductVersion();
 
   try {
+    g_log << Logger::Info << "启动 mainthread" << endl;
     mainthread();
   }
   catch (const PDNSException& e) {
